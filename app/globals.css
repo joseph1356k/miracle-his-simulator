@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-sans: "Inter", "Segoe UI", system-ui, sans-serif;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  @apply bg-ink-100 text-ink-900 antialiased;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+/* Dense enterprise scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #c2c9d6 transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: #c2c9d6;
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background-color: #aab3c4;
+}
+
+@layer components {
+  .field-label {
+    @apply mb-1 block text-xs font-medium text-ink-600;
+  }
+  .field-input {
+    @apply w-full rounded-md border border-ink-200 bg-white px-2.5 py-1.5 text-sm text-ink-900
+      shadow-sm outline-none transition placeholder:text-ink-400
+      focus:border-clinical-500 focus:ring-2 focus:ring-clinical-500/20
+      disabled:cursor-not-allowed disabled:bg-ink-50 disabled:text-ink-400;
+  }
+  .field-help {
+    @apply mt-1 text-2xs text-ink-400;
+  }
+  .field-error {
+    @apply mt-1 text-2xs font-medium text-rose-600;
+  }
+  .section-card {
+    @apply rounded-lg border border-ink-200 bg-white shadow-sm;
+  }
+  .section-title {
+    @apply text-sm font-semibold text-ink-900;
+  }
+  .data-cell {
+    @apply px-3 py-2 text-sm text-ink-700;
+  }
+  .focus-ring {
+    @apply outline-none focus-visible:ring-2 focus-visible:ring-clinical-500/40 focus-visible:ring-offset-1;
+  }
+}
+
+/* Honor reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
