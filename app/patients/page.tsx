@@ -83,7 +83,7 @@ export default function PatientsPage() {
         title="Índice maestro de pacientes"
         description={`${patients.length} pacientes sintéticos registrados.`}
         icon={<Users className="h-5 w-5" />}
-        actions={<Button onClick={() => router.push("/admissions")} data-testid="patients-new"><UserPlus className="h-4 w-4" /> Nuevo registro</Button>}
+        actions={<Button onClick={() => router.push("/patients/new")} data-testid="patients-new"><UserPlus className="h-4 w-4" /> Registrar paciente</Button>}
       />
 
       {duplicates.length > 0 && (

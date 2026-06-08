@@ -45,6 +45,7 @@ export function Section({
   actions,
   className,
   testId,
+  icon,
 }: {
   title: string;
   description?: string;
@@ -52,11 +53,15 @@ export function Section({
   actions?: React.ReactNode;
   className?: string;
   testId?: string;
+  icon?: React.ReactNode;
 }) {
   return (
     <section className={cn("section-card", className)} data-testid={testId} aria-label={title}>
       <div className="flex items-center justify-between gap-2 border-b border-ink-200 bg-ink-50/60 px-4 py-2.5">
-        <h4 className="text-xs font-semibold uppercase tracking-wide text-ink-600">{title}</h4>
+        <h4 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-ink-600">
+          {icon}
+          {title}
+        </h4>
         {actions}
       </div>
       {description && <p className="px-4 pt-3 text-xs text-ink-500">{description}</p>}
@@ -77,7 +82,7 @@ export function Stat({
   label: string;
   value: React.ReactNode;
   hint?: string;
-  tone?: "default" | "blue" | "green" | "amber" | "red";
+  tone?: "default" | "blue" | "green" | "amber" | "red" | "teal" | "purple";
   icon?: React.ReactNode;
   onClick?: () => void;
   testId?: string;
@@ -88,6 +93,8 @@ export function Stat({
     green: "border-emerald-200 bg-emerald-50/40",
     amber: "border-amber-200 bg-amber-50/40",
     red: "border-rose-200 bg-rose-50/40",
+    teal: "border-teal-200 bg-teal-50/40",
+    purple: "border-violet-200 bg-violet-50/40",
   };
   const Comp = onClick ? "button" : "div";
   return (

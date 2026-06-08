@@ -45,6 +45,7 @@ export type ModuleKey =
   | "dashboard"
   | "clinical-inbox"
   | "patients"
+  | "patient-registration"
   | "admissions"
   | "emergency"
   | "outpatient"

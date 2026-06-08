@@ -59,6 +59,7 @@ interface BaseFieldProps {
   disabled?: boolean;
   className?: string;
   containerClassName?: string;
+  labelClassName?: string;
 }
 
 function FieldShell({
@@ -69,11 +70,12 @@ function FieldShell({
   help,
   error,
   containerClassName,
+  labelClassName,
   children,
 }: BaseFieldProps & { children: React.ReactNode }) {
   return (
     <div className={cn("min-w-0", containerClassName)} data-field-testid={testId}>
-      <label htmlFor={id} className="field-label">
+      <label htmlFor={id} className={cn("field-label", labelClassName)}>
         {label}
         {required && <span className="ml-0.5 text-rose-500" aria-hidden>*</span>}
       </label>

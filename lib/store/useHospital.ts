@@ -23,6 +23,7 @@ import type {
   NursingTask,
   Order,
   OrderStatus,
+  Patient,
   Referral,
   SurgeryCase,
   VitalSigns,
@@ -67,6 +68,7 @@ interface HospitalState {
   resetData: () => void;
   pushAudit: (partial: Partial<AuditEvent> & { action: string; entity: string; module: string }) => void;
 
+  addPatient: (p: Patient) => void;
   addEncounter: (e: Encounter) => void;
   setEncounterStatus: (id: string, status: EncounterStatus) => void;
   addAuthorization: (a: Authorization) => void;
@@ -120,6 +122,15 @@ export const useHospital = create<HospitalState>()(
 
       pushAudit: (partial) =>
         set((st) => ({ data: { ...st.data, audit: [makeAudit(partial), ...st.data.audit] } })),
+
+      addPatient: (p) =>
+        set((st) => ({
+          data: {
+            ...st.data,
+            patients: [p, ...st.data.patients],
+            audit: [makeAudit({ action: "create", entity: "Patient", module: "patient-registration", patientId: p.id, newValue: `${p.firstName} ${p.lastName}` }), ...st.data.audit],
+          },
+        })),
 
       addEncounter: (e) =>
         set((st) => ({

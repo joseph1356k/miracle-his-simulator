@@ -12,7 +12,7 @@ export const ROLES: Role[] = [
     shortLabel: "Urgencias",
     description: "Atiende pacientes en el servicio de urgencias.",
     modules: [
-      "dashboard", "clinical-inbox", "patients", "emergency", "documentation",
+      "dashboard", "clinical-inbox", "patients", "patient-registration", "emergency", "documentation",
       "orders", "lab", "imaging", "medications", "nursing", "referrals",
       "discharge", "interoperability", "audit", "miracle-test-lab",
     ],
@@ -27,7 +27,7 @@ export const ROLES: Role[] = [
     shortLabel: "Hospitalización",
     description: "Gestiona pacientes hospitalizados y en UCI.",
     modules: [
-      "dashboard", "clinical-inbox", "patients", "inpatient", "icu",
+      "dashboard", "clinical-inbox", "patients", "patient-registration", "inpatient", "icu",
       "documentation", "orders", "lab", "imaging", "medications", "nursing",
       "referrals", "surgery", "discharge", "interoperability", "audit",
       "miracle-test-lab",
@@ -43,7 +43,7 @@ export const ROLES: Role[] = [
     shortLabel: "Especialista",
     description: "Atiende consulta externa e interconsultas.",
     modules: [
-      "dashboard", "clinical-inbox", "patients", "outpatient", "documentation",
+      "dashboard", "clinical-inbox", "patients", "patient-registration", "outpatient", "documentation",
       "orders", "lab", "imaging", "medications", "referrals", "audit",
       "miracle-test-lab",
     ],
@@ -58,7 +58,7 @@ export const ROLES: Role[] = [
     shortLabel: "Enfermería",
     description: "Registra signos vitales, notas y administración.",
     modules: [
-      "dashboard", "clinical-inbox", "patients", "nursing", "inpatient", "icu",
+      "dashboard", "clinical-inbox", "patients", "patient-registration", "nursing", "inpatient", "icu",
       "emergency", "medications", "documentation", "orders", "audit",
       "miracle-test-lab",
     ],
@@ -73,7 +73,7 @@ export const ROLES: Role[] = [
     shortLabel: "Auxiliar enf.",
     description: "Apoya tareas de enfermería y toma de signos.",
     modules: [
-      "dashboard", "patients", "nursing", "inpatient", "medications", "audit",
+      "dashboard", "patients", "patient-registration", "nursing", "inpatient", "medications", "audit",
       "miracle-test-lab",
     ],
     canSignNotes: false,
@@ -87,7 +87,7 @@ export const ROLES: Role[] = [
     shortLabel: "Admisiones",
     description: "Registra pacientes y gestiona ingresos.",
     modules: [
-      "dashboard", "patients", "admissions", "billing", "referrals", "audit",
+      "dashboard", "patients", "patient-registration", "admissions", "billing", "referrals", "audit",
       "miracle-test-lab",
     ],
     canSignNotes: false,
@@ -101,7 +101,7 @@ export const ROLES: Role[] = [
     shortLabel: "Laboratorio",
     description: "Procesa muestras y registra resultados.",
     modules: [
-      "dashboard", "lab", "orders", "patients", "audit", "miracle-test-lab",
+      "dashboard", "lab", "orders", "patients", "patient-registration", "audit", "miracle-test-lab",
     ],
     canSignNotes: false,
     canPrescribe: false,
@@ -114,7 +114,7 @@ export const ROLES: Role[] = [
     shortLabel: "Radiología",
     description: "Gestiona estudios e informes de imágenes.",
     modules: [
-      "dashboard", "imaging", "orders", "patients", "audit", "miracle-test-lab",
+      "dashboard", "imaging", "orders", "patients", "patient-registration", "audit", "miracle-test-lab",
     ],
     canSignNotes: true,
     canPrescribe: false,
@@ -127,7 +127,7 @@ export const ROLES: Role[] = [
     shortLabel: "Farmacia",
     description: "Valida y dispensa medicamentos.",
     modules: [
-      "dashboard", "pharmacy", "medications", "inventory", "orders", "patients",
+      "dashboard", "pharmacy", "medications", "inventory", "orders", "patients", "patient-registration",
       "audit", "miracle-test-lab",
     ],
     canSignNotes: false,
@@ -141,7 +141,7 @@ export const ROLES: Role[] = [
     shortLabel: "Cirugía",
     description: "Programa y documenta procedimientos quirúrgicos.",
     modules: [
-      "dashboard", "surgery", "patients", "orders", "documentation", "inpatient",
+      "dashboard", "surgery", "patients", "patient-registration", "orders", "documentation", "inpatient",
       "audit", "miracle-test-lab",
     ],
     canSignNotes: true,
@@ -155,7 +155,7 @@ export const ROLES: Role[] = [
     shortLabel: "Facturación",
     description: "Gestiona autorizaciones EPS y facturas.",
     modules: [
-      "dashboard", "billing", "admissions", "patients", "reports", "audit",
+      "dashboard", "billing", "admissions", "patients", "patient-registration", "reports", "audit",
       "miracle-test-lab",
     ],
     canSignNotes: false,
@@ -169,7 +169,7 @@ export const ROLES: Role[] = [
     shortLabel: "Auditor",
     description: "Audita documentación y trazabilidad clínica.",
     modules: [
-      "dashboard", "audit", "patients", "reports", "documentation",
+      "dashboard", "audit", "patients", "patient-registration", "reports", "documentation",
       "interoperability", "miracle-test-lab",
     ],
     canSignNotes: false,

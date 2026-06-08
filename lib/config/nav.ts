@@ -22,6 +22,7 @@ import {
   ShieldCheck,
   Stethoscope,
   TestTubes,
+  UserPlus,
   Users,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -47,6 +48,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { key: "dashboard", label: "Inicio", href: "/dashboard", testId: "nav-dashboard", icon: LayoutDashboard },
       { key: "clinical-inbox", label: "Bandeja clínica", href: "/clinical-inbox", testId: "nav-clinical-inbox", icon: Inbox },
       { key: "patients", label: "Pacientes", href: "/patients", testId: "nav-patients", icon: Users },
+      { key: "patient-registration", label: "Registro de pacientes", href: "/patients/new", testId: "nav-patient-registration", icon: UserPlus },
       { key: "admissions", label: "Admisiones", href: "/admissions", testId: "nav-admissions", icon: ClipboardList },
     ],
   },
