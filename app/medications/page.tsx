@@ -41,6 +41,19 @@ export default function MedicationsPage() {
 
   const upd = (k: string, v: string) => setMed((s) => ({ ...s, [k]: v }));
 
+  const addNote = useHospital((s) => s.addNote);
+  const saveReconciliation = () => {
+    if (!patient) { addToast({ title: "Seleccione un paciente", variant: "warning" }); return; }
+    if (!home.trim() && !active.trim() && !recon.trim()) { addToast({ title: "Escriba la conciliación", variant: "warning" }); return; }
+    addNote({
+      id: genId("note"), encounterId: encounter?.id ?? "sin-encuentro", patientId: patient.id, type: "progress",
+      title: "Conciliación de medicamentos", status: "signed", author: userName, authorRole: roleId, createdAt: nowIso(), signedAt: nowIso(),
+      sections: { "Medicamentos en casa": home, "Medicamentos hospitalarios": active, "Nota de conciliación": recon },
+    });
+    addToast({ title: "Conciliación guardada", variant: "success" });
+    setHome(""); setActive(""); setRecon("");
+  };
+
   const addMed = () => {
     if (!patient) { addToast({ title: "Seleccione un paciente", variant: "warning" }); return; }
     if (!med.name) { addToast({ title: "Ingrese el medicamento", variant: "warning" }); return; }
@@ -73,7 +86,7 @@ export default function MedicationsPage() {
                     <TextAreaField id="med-active" name="activeMedications" testId="field-active-medications" label="Medicamentos hospitalarios" section="Conciliación" rows={3} value={active} onChange={setActive} placeholder="Enoxaparina, Omeprazol…" />
                     <TextAreaField id="med-recon" name="reconciliationNote" testId="field-reconciliation-note" label="Nota de conciliación" section="Conciliación" rows={3} value={recon} onChange={setRecon} placeholder="Decisiones: suspender, continuar, ajustar…" />
                   </div>
-                  <Button className="mt-3" size="sm" variant="outline" onClick={() => addToast({ title: "Conciliación guardada (demo)", variant: "success" })} data-testid="button-save-reconciliation">Guardar conciliación</Button>
+                  <Button className="mt-3" size="sm" variant="outline" onClick={saveReconciliation} data-testid="button-save-reconciliation">Guardar conciliación</Button>
                 </Section>
 
                 <Section title="Medicamentos del paciente" testId="section-patient-meds">

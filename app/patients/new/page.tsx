@@ -36,6 +36,23 @@ const EMPTY = {
   appearance: "", exam: "", riskFactors: "", clinicalSummary: "",
 };
 
+/** "14/05/1990", "14-05-1990", "14.05.1990", "14051990" or "1990-05-14" → "1990-05-14". "" → "". Invalid → null. */
+function parseBirthDate(text: string): string | null {
+  const t = text.trim();
+  if (!t) return "";
+  let d: number, m: number, y: number;
+  let g = t.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if (g) { y = +g[1]; m = +g[2]; d = +g[3]; }
+  else {
+    g = t.match(/^(\d{1,2})[\/.\- ](\d{1,2})[\/.\- ](\d{4})$/) ?? t.match(/^(\d{2})(\d{2})(\d{4})$/);
+    if (!g) return null;
+    d = +g[1]; m = +g[2]; y = +g[3];
+  }
+  const date = new Date(Date.UTC(y, m - 1, d));
+  if (date.getUTCFullYear() !== y || date.getUTCMonth() !== m - 1 || date.getUTCDate() !== d || date.getTime() > Date.now() || y < 1900) return null;
+  return `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+}
+
 function parseAllergies(text: string): Allergy[] {
   const t = text.trim();
   if (!t || /\b(niega|ninguna|sin alergias)\b/i.test(t)) return [];
@@ -64,6 +81,11 @@ export default function NewPatientPage() {
       addToast({ title: "Faltan datos obligatorios", description: "Nombre, apellido y número de documento son requeridos.", variant: "warning" });
       return;
     }
+    const birthDate = parseBirthDate(f.birthDate);
+    if (birthDate === null) {
+      addToast({ title: "Fecha de nacimiento inválida", description: "Use el formato dd/mm/aaaa, por ejemplo 14/05/1990.", variant: "warning" });
+      return;
+    }
     const id = genId("pat");
     const patient: Patient = {
       id,
@@ -72,7 +94,7 @@ export default function NewPatientPage() {
       documentNumber: f.documentNumber.trim(),
       firstName: f.firstName.trim(),
       lastName: f.lastName.trim(),
-      birthDate: f.birthDate || "1990-01-01",
+      birthDate: birthDate || "1990-01-01",
       sex: (f.sex || "M") as Patient["sex"],
       gender: f.sex === "F" ? "Femenino" : f.sex === "Other" ? "Otro" : "Masculino",
       bloodType: (f.bloodType || undefined) as Patient["bloodType"],
@@ -175,7 +197,7 @@ export default function NewPatientPage() {
             <SelectField {...big} id="reg-coverage" name="coverageClass" testId="field-reg-coverage-class" label="Clase de cobertura" section="Identificación" value={f.coverageClass} onChange={(v) => upd("coverageClass", v)} placeholder="Seleccionar" options={["Contributivo", "Subsidiado", "Particular", "Medicina prepagada", "SOAT", "ARL"]} />
             <TextField {...big} id="reg-first" name="firstName" testId="field-reg-first-name" label="Nombre" section="Identificación" value={f.firstName} onChange={(v) => upd("firstName", v)} required placeholder="Valentina" />
             <TextField {...big} id="reg-last" name="lastName" testId="field-reg-last-name" label="Apellido" section="Identificación" value={f.lastName} onChange={(v) => upd("lastName", v)} required placeholder="Gómez Ruiz" />
-            <TextField {...big} id="reg-birth" name="birthDate" testId="field-reg-birth-date" label="Fecha de nacimiento" section="Identificación" type="date" value={f.birthDate} onChange={(v) => upd("birthDate", v)} />
+            <TextField {...big} id="reg-birth" name="birthDate" testId="field-reg-birth-date" label="Fecha de nacimiento" section="Identificación" value={f.birthDate} onChange={(v) => upd("birthDate", v)} placeholder="dd/mm/aaaa" inputMode="numeric" help="Formato dd/mm/aaaa" />
             <SelectField {...big} id="reg-sex" name="sex" testId="field-reg-sex" label="Sexo biológico" section="Identificación" value={f.sex} onChange={(v) => upd("sex", v)} placeholder="Seleccionar" options={[{ value: "M", label: "Masculino" }, { value: "F", label: "Femenino" }, { value: "Other", label: "Intersexual / otro" }]} />
             <TextField {...big} id="reg-phone" name="phone" testId="field-reg-phone" label="Teléfono móvil" section="Identificación" type="tel" value={f.phone} onChange={(v) => upd("phone", v)} placeholder="+57 300 555 1134" />
             <TextField {...big} id="reg-email" name="email" testId="field-reg-email" label="Correo electrónico" section="Identificación" type="email" value={f.email} onChange={(v) => upd("email", v)} placeholder="paciente@email.com" />

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { usePathname } from "next/navigation";
 import { AlertOctagon, Bed, Droplet, HeartPulse, ShieldAlert, Stethoscope, UserRound, X, PanelRightOpen } from "lucide-react";
 import { useSession } from "@/lib/store/useSession";
 import { useHospital } from "@/lib/store/useHospital";
@@ -25,6 +26,7 @@ const ISOLATION_LABEL: Record<string, string> = {
 };
 
 export function PatientHeader() {
+  const pathname = usePathname();
   const { selectedPatientId, selectedEncounterId, selectEncounter, clearSelection } = useSession();
   const data = useHospital((s) => s.data);
   const setPatientDrawer = useUI((s) => s.setPatientDrawer);
@@ -48,7 +50,8 @@ export function PatientHeader() {
     return { patient, encounter, lastVitals, dxs };
   }, [selectedPatientId, selectedEncounterId, data]);
 
-  if (!ctx) return null;
+  // Registering a NEW patient: showing the previously selected one would mix two people on screen.
+  if (!ctx || pathname.startsWith("/patients/new")) return null;
   const { patient, encounter, lastVitals, dxs } = ctx;
 
   return (
@@ -71,6 +74,8 @@ export function PatientHeader() {
               <p className="text-2xs text-ink-500">
                 {ageFromBirthDate(patient.birthDate)} años · {patient.sex === "M" ? "Masculino" : patient.sex === "F" ? "Femenino" : "Otro"} · {patient.documentType} {patient.documentNumber} · HC {patient.recordNumber}
               </p>
+              {/* One text node, "Documento: N": the form automation agents read as the record's identity. */}
+              <p className="text-2xs font-medium text-ink-600" data-testid="patient-document">{`Documento: ${patient.documentNumber}`}</p>
             </div>
           </div>
 

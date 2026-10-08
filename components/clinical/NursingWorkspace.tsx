@@ -62,6 +62,14 @@ export function NursingWorkspace({ defaultTab = "tasks" }: { defaultTab?: string
       title: "Nota de enfermería", status: "signed", author: userName, authorRole: roleId, createdAt: nowIso(), signedAt: nowIso(),
       sections: { "Nota de enfermería": note.nursingNote, "Plan de cuidado": note.carePlan, "Educación al paciente": note.education, Observaciones: note.observations },
     });
+    if (v.temperature || v.painScale) {
+      addVitals({
+        id: genId("vit"), encounterId: encounter?.id ?? "sin-encuentro", patientId: patient.id, recordedAt: nowIso(),
+        recordedBy: userName, recordedByRole: roleId, temperature: v.temperature ? Number(v.temperature) : undefined,
+        painScale: v.painScale ? Number(v.painScale) : undefined, comments: "Registrado con la nota de enfermería",
+      });
+      setV({ ...EMPTY_VITALS });
+    }
     addToast({ title: "Nota de enfermería guardada", variant: "success" });
     setNote({ nursingNote: "", carePlan: "", observations: "", education: "" });
   };

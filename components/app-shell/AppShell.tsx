@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import { ALL_NAV_ITEMS } from "@/lib/config/nav";
 import { createPortal } from "react-dom";
 import { Activity } from "lucide-react";
 import { Sidebar } from "@/components/app-shell/Sidebar";
@@ -21,6 +23,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const setCommandOpen = useUI((s) => s.setCommandOpen);
   const toggleMiracle = useUI((s) => s.toggleMiracleOverlay);
   const toggleAudit = useUI((s) => s.toggleAuditPanel);
+
+  const pathname = usePathname();
+  useEffect(() => { document.title = `${screenTitle(pathname)} · Miracle Hospital HIS Simulator`; }, [pathname]);
 
   useEffect(() => {
     seedIfEmpty();
@@ -84,4 +89,27 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <Toaster />
     </div>
   );
+}
+
+/** Window title per screen: UI-automation agents read the browser window title to know where they are. */
+const SUB_SCREENS: [string, string][] = [
+  ["/emergency/triage", "Triage de enfermería"],
+  ["/emergency/encounter/", "Nota médica de urgencias"],
+  ["/outpatient/consultation/", "Nota de consulta (SOAP)"],
+  ["/outpatient/schedule", "Agenda de consulta externa"],
+  ["/inpatient/encounter/", "Encuentro de hospitalización"],
+  ["/inpatient/bed-board", "Mapa de camas"],
+  ["/orders/new", "Nueva orden médica"],
+  ["/discharge/", "Epicrisis de egreso"],
+  ["/surgery/case/", "Nota operatoria"],
+  ["/nursing/vitals", "Enfermería · Signos vitales"],
+  ["/nursing/notes", "Enfermería · Notas"],
+  ["/nursing/tasks", "Enfermería · Tareas"],
+];
+function screenTitle(pathname: string): string {
+  const sub = SUB_SCREENS.find(([prefix]) => pathname.startsWith(prefix));
+  if (sub) return sub[1];
+  if (/^\/patients\/(?!new)[^/]+$/.test(pathname)) return "Ficha del paciente";
+  const nav = ALL_NAV_ITEMS.filter((i) => pathname.startsWith(i.href)).sort((a, b) => b.href.length - a.href.length)[0];
+  return nav?.label ?? "Inicio";
 }

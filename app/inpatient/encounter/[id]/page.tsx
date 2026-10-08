@@ -49,6 +49,13 @@ export default function InpatientEncounterPage() {
 
   if (!encounter || !patient) return <PageContainer><p className="text-sm text-ink-500">Encuentro no encontrado.</p></PageContainer>;
 
+  const saveDischargePlan = () => {
+    if (!dischargePlan.trim()) { addToast({ title: "Escriba el plan de egreso", variant: "warning" }); return; }
+    addNote({ id: genId("note"), encounterId: encounter.id, patientId: patient.id, type: "progress", title: "Plan de egreso", status: "signed", author: userName, authorRole: roleId, createdAt: nowIso(), signedAt: nowIso(), body: dischargePlan });
+    addToast({ title: "Plan de egreso guardado", variant: "success" });
+    setDischargePlan("");
+  };
+
   const saveEvolution = () => {
     if (!evolution.trim()) { addToast({ title: "Escriba la evolución", variant: "warning" }); return; }
     addNote({ id: genId("note"), encounterId: encounter.id, patientId: patient.id, type: "progress", title: "Evolución médica", status: "signed", author: userName, authorRole: roleId, createdAt: nowIso(), signedAt: nowIso(), body: evolution });
@@ -140,7 +147,7 @@ export default function InpatientEncounterPage() {
           </Section>
         ) },
         { key: "discharge-plan", label: "Plan de egreso", content: (
-          <Section title="Plan de egreso" testId="section-discharge-plan" actions={<Button size="sm" onClick={() => router.push(`/discharge/${encounter.id}`)}>Abrir epicrisis</Button>}>
+          <Section title="Plan de egreso" testId="section-discharge-plan" actions={<div className="flex gap-1.5"><Button size="sm" variant="outline" onClick={saveDischargePlan} data-testid="button-save-discharge-plan">Guardar plan</Button><Button size="sm" onClick={() => router.push(`/discharge/${encounter.id}`)}>Abrir epicrisis</Button></div>}>
             <TextAreaField id="dp-plan" name="dischargePlan" testId="field-discharge-plan" label="Planeación de egreso" section="Plan de egreso" rows={4} value={dischargePlan} onChange={setDischargePlan} help="Criterios de egreso, pendientes, educación y red de apoyo." />
           </Section>
         ) },
