@@ -25,7 +25,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const toggleAudit = useUI((s) => s.toggleAuditPanel);
 
   const pathname = usePathname();
-  useEffect(() => { document.title = `${screenTitle(pathname)} · Miracle Hospital HIS Simulator`; }, [pathname]);
 
   useEffect(() => {
     seedIfEmpty();
@@ -44,6 +43,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [setCommandOpen, toggleMiracle, toggleAudit]);
+
+  // After mount too: on a first load Next's metadata sets the generic title once the shell hydrates.
+  useEffect(() => {
+    if (!mounted) return;
+    const title = `${screenTitle(pathname)} · Miracle Hospital HIS Simulator`;
+    document.title = title;
+    const again = setTimeout(() => { document.title = title; }, 300);
+    return () => clearTimeout(again);
+  }, [pathname, mounted]);
 
   if (!mounted) {
     return (
@@ -105,6 +113,7 @@ const SUB_SCREENS: [string, string][] = [
   ["/nursing/vitals", "Enfermería · Signos vitales"],
   ["/nursing/notes", "Enfermería · Notas"],
   ["/nursing/tasks", "Enfermería · Tareas"],
+  ["/documentation", "Historia clínica · Centro de documentación"],
 ];
 function screenTitle(pathname: string): string {
   const sub = SUB_SCREENS.find(([prefix]) => pathname.startsWith(prefix));
