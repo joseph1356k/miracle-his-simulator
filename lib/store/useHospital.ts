@@ -29,7 +29,7 @@ import type {
   VitalSigns,
 } from "@/lib/types";
 
-const SCHEMA_VERSION = 3;
+const SCHEMA_VERSION = 4; // 4: dispensación con inventario y control especial (Ü Analytics)
 
 function emptyDataset(): HospitalDataset {
   return {
@@ -88,6 +88,8 @@ interface HospitalState {
 
   addMedication: (m: MedicationOrder) => void;
   setMedValidation: (id: string, status: MedicationOrder["validationStatus"]) => void;
+  /** Farmacia entrega el medicamento: queda dispensado, descuenta inventario y deja auditoría. */
+  dispenseMedication: (id: string) => void;
   administerMar: (medId: string, marId: string) => void;
   omitMar: (medId: string, marId: string, reason: string) => void;
 
@@ -267,6 +269,43 @@ export const useHospital = create<HospitalState>()(
             audit: [makeAudit({ action: "create", entity: "MedicationOrder", module: "medications", patientId: m.patientId, encounterId: m.encounterId, newValue: `${m.medicationName} ${m.dose}${m.unit}` }), ...st.data.audit],
           },
         })),
+
+      dispenseMedication: (id) =>
+        set((st) => {
+          const m = st.data.medications.find((x) => x.id === id);
+          if (!m || m.dispensedAt) return st;
+          const s = useSession.getState();
+          // El ítem de inventario es el del mismo genérico: "Fentanilo 40g" → "Fentanilo 100 mcg ampolla".
+          const generico = m.medicationName.split(/\s+\d/)[0].trim().toLowerCase();
+          const item = st.data.inventory.find(
+            (i) => i.category === "medicamento" && i.name.toLowerCase().startsWith(generico),
+          );
+          return {
+            data: {
+              ...st.data,
+              medications: st.data.medications.map((x) =>
+                x.id === id ? { ...x, dispensedAt: nowIso(), dispensedBy: s.userName } : x,
+              ),
+              inventory: item
+                ? st.data.inventory.map((i) => (i.id === item.id ? { ...i, stock: Math.max(0, i.stock - 1) } : i))
+                : st.data.inventory,
+              audit: [
+                makeAudit({
+                  action: "dispense",
+                  entity: "MedicationOrder",
+                  module: "pharmacy",
+                  patientId: m.patientId,
+                  encounterId: m.encounterId,
+                  field: "dispensedAt",
+                  newValue: item
+                    ? `Dispensado ${m.medicationName} · inventario ${item.name}: ${item.stock} → ${Math.max(0, item.stock - 1)}`
+                    : `Dispensado ${m.medicationName}`,
+                }),
+                ...st.data.audit,
+              ],
+            },
+          };
+        }),
 
       setMedValidation: (id, status) =>
         set((st) => {

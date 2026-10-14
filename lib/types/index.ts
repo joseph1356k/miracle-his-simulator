@@ -322,6 +322,10 @@ export interface MedicationOrder {
   validationStatus: "pending" | "validated" | "rejected";
   flags: string[];
   schedule: MarEntry[];
+  /** Cuándo farmacia lo dispensó (ISO). Sin dispensar: undefined. */
+  dispensedAt?: string;
+  /** Quién lo dispensó. */
+  dispensedBy?: string;
 }
 
 /* -------------------------------------------------------- Laboratory ------ */
@@ -498,6 +502,10 @@ export interface InventoryItem {
   expiry: string;
   supplier: string;
   location: string;
+  /** Medicamento de control especial (Fondo Nacional de Estupefacientes). */
+  controlled?: boolean;
+  /** Costo unitario en COP. */
+  unitCost?: number;
 }
 
 /* -------------------------------------------------------------- Audit ----- */

@@ -15,13 +15,20 @@ import { medValidationMeta } from "@/lib/utils/status";
 export function PharmacyWorkspace({ defaultTab = "validation" }: { defaultTab?: string }) {
   const data = useHospital((s) => s.data);
   const setMedValidation = useHospital((s) => s.setMedValidation);
-  const pushAudit = useHospital((s) => s.pushAudit);
+  const dispenseMedication = useHospital((s) => s.dispenseMedication);
   const addToast = useUI((s) => s.addToast);
 
   const name = (id: string) => { const p = data.patients.find((x) => x.id === id); return p ? fullName(p) : id; };
   const pending = useMemo(() => data.medications.filter((m) => m.validationStatus === "pending"), [data.medications]);
   const validated = useMemo(() => data.medications.filter((m) => m.validationStatus === "validated"), [data.medications]);
+  // Por dispensar: validados que farmacia todavía no entregó. Los entregados pasan a "Dispensados hoy".
+  const toDispense = useMemo(() => validated.filter((m) => !m.dispensedAt), [validated]);
+  const dispensed = useMemo(
+    () => validated.filter((m) => m.dispensedAt).sort((a, b) => (b.dispensedAt ?? "").localeCompare(a.dispensedAt ?? "")),
+    [validated],
+  );
   const lowStock = useMemo(() => data.inventory.filter((i) => i.category === "medicamento" && i.stock <= i.min), [data.inventory]);
+  const hour = (iso?: string) => (iso ? new Date(iso).toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit" }) : "");
 
   return (
     <PageContainer>
@@ -51,15 +58,15 @@ export function PharmacyWorkspace({ defaultTab = "validation" }: { defaultTab?: 
             )}
           </Section>
         ) },
-        { key: "dispensing", label: "Dispensación", badge: <Badge tone="green">{validated.length}</Badge>, content: (
+        { key: "dispensing", label: "Dispensación", badge: <Badge tone="green">{toDispense.length}</Badge>, content: (
           <Section title="Medicamentos validados para dispensar" testId="section-pharmacy-dispensing">
-            {validated.length === 0 ? <p className="text-sm text-ink-400">Nada por dispensar.</p> : (
+            {toDispense.length === 0 ? <p className="text-sm text-ink-400">Nada por dispensar.</p> : (
               <div className="space-y-1.5">
-                {validated.slice(0, 50).map((m) => (
+                {toDispense.slice(0, 50).map((m) => (
                   <div key={m.id} className="flex items-center gap-2 rounded-md border border-ink-200 px-3 py-2 text-sm">
                     <Badge tone={medValidationMeta(m.validationStatus).tone}>{medValidationMeta(m.validationStatus).label}</Badge>
                     <span className="flex-1"><span className="font-medium text-ink-800">{m.medicationName}</span> <span className="text-2xs text-ink-500">{m.dose}{m.unit} · {name(m.patientId)}</span></span>
-                    <Button size="sm" variant="outline" onClick={() => { pushAudit({ action: "update", entity: "MedicationOrder", module: "pharmacy", patientId: m.patientId, newValue: `Dispensado ${m.medicationName}` }); addToast({ title: "Dispensado (demo)", variant: "success" }); }} data-testid={`pharmacy-dispense-${m.id}`}><PackageCheck className="h-3.5 w-3.5" /> Dispensar</Button>
+                    <Button size="sm" variant="outline" onClick={() => { dispenseMedication(m.id); addToast({ title: `Dispensado · ${m.medicationName}`, variant: "success" }); }} data-testid={`pharmacy-dispense-${m.id}`}><PackageCheck className="h-3.5 w-3.5" /> Dispensar</Button>
                   </div>
                 ))}
               </div>
@@ -73,6 +80,7 @@ export function PharmacyWorkspace({ defaultTab = "validation" }: { defaultTab?: 
                 {lowStock.map((i) => (
                   <div key={i.id} className="flex items-center gap-2 rounded-md border border-rose-200 bg-rose-50/50 px-3 py-2 text-sm">
                     <span className="flex-1 text-ink-800">{i.name}</span>
+                    {i.controlled ? <Badge tone="amber">Control especial</Badge> : null}
                     <Badge tone="red">{i.stock} / mín {i.min} {i.unit}</Badge>
                     <span className="text-2xs text-ink-400">{i.location}</span>
                   </div>
@@ -82,6 +90,19 @@ export function PharmacyWorkspace({ defaultTab = "validation" }: { defaultTab?: 
           </Section>
         ) },
       ]} />
+
+      <Section title="Dispensados hoy" testId="section-pharmacy-dispensed">
+        {dispensed.length === 0 ? <p className="text-sm text-ink-400">Todavía no se ha dispensado nada.</p> : (
+          <div className="space-y-1.5">
+            {dispensed.slice(0, 50).map((m) => (
+              <div key={m.id} className="flex items-center gap-2 rounded-md border border-ink-200 px-3 py-2 text-sm">
+                <Badge tone="blue">Dispensado</Badge>
+                <span className="flex-1"><span className="font-medium text-ink-800">{m.medicationName}</span> <span className="text-2xs text-ink-500">{m.dose}{m.unit} · {name(m.patientId)} · {hour(m.dispensedAt)} · {m.dispensedBy}</span></span>
+              </div>
+            ))}
+          </div>
+        )}
+      </Section>
     </PageContainer>
   );
 }

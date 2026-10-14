@@ -611,6 +611,29 @@ export function buildSeed(now: number = Date.now()): HospitalDataset {
     }
   }
 
+  /* ---- control especial (Ü Analytics): valores fijos, sin tocar el generador, para no mover el resto de la semilla ---- */
+  const controlados: Array<[string, number, number, string, number]> = [
+    ["Fentanilo 100 mcg ampolla", 12, 10, "ampolla", 18500],
+    ["Midazolam 5 mg ampolla", 9, 6, "ampolla", 7200],
+    ["Morfina 10 mg ampolla", 15, 10, "ampolla", 6400],
+  ];
+  for (const [name, stock, min, unit, unitCost] of controlados) {
+    inventory.push({
+      id: `inv-${pad(invIdx++)}`,
+      name,
+      category: "medicamento",
+      stock,
+      min,
+      unit,
+      lot: "LCE-2026-10",
+      expiry: "2027-06-30",
+      supplier: "Fondo Nacional de Estupefacientes",
+      location: "Farmacia central · bóveda",
+      controlled: true,
+      unitCost,
+    });
+  }
+
   /* ---- a few seed clinical notes ---- */
   clinicalEncounters.slice(0, 12).forEach((enc, idx) => {
     notes.push({
